@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Квиз: Мат. Анализ 1 Семестр</title>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #1a365d; margin-bottom: 10px; }
+        .progress { text-align: center; color: #718096; margin-bottom: 30px; font-weight: bold; }
+        .question-title { font-weight: bold; font-size: 1.2em; color: #2b6cb0; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        
+        /* Стили для экрана выбора */
+        .selection-list { max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 20px; background: #f8fafc; }
+        .selection-item { padding: 8px; border-bottom: 1px solid #edf2f7; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.1s; }
+        .selection-item:hover { background: #e2e8f0; }
+        .selection-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .selection-item label { cursor: pointer; flex-grow: 1; font-size: 1.05em; }
+
+        .learn-block { background: #f7fafc; padding: 20px; border-left: 4px solid #4299e1; border-radius: 4px; margin-bottom: 20px; line-height: 1.6; font-size: 1.1em; }
+        .btn { background: #4299e1; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: bold; transition: 0.2s; }
+        .btn:hover { background: #2b6cb0; }
+        .btn-check { background: #48bb78; }
+        .btn-check:hover { background: #2f855a; }
+        .btn-reset { background: #ed8936; }
+        .btn-reset:hover { background: #dd6b20; }
+        .btn-back { background: #a0aec0; }
+        .btn-back:hover { background: #718096; }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; }
+        
+        .hidden { display: none !important; }
+        .answer-area { min-height: 100px; border: 2px dashed #cbd5e0; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; background: #fff; align-items: flex-start; align-content: flex-start; }
+        .pool-area { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+        .word-btn { background: #e2e8f0; border: 1px solid #cbd5e0; padding: 8px 12px; border-radius: 6px; cursor: pointer; user-select: none; font-size: 1.05em; display: inline-block; transition: 0.1s; }
+        .word-btn:hover { background: #cbd5e0; }
+        .word-btn.correct { background: #c6f6d5; border-color: #68d391; color: #22543d; cursor: default; pointer-events: none; }
+        .word-btn.wrong { background: #fed7d7; border-color: #f56565; color: #742a2a; }
+        .status-msg { font-weight: bold; margin-bottom: 15px; text-align: center; font-size: 1.2em; }
+        .status-correct { color: #38a169; }
+        .status-wrong { color: #e53e3e; }
+        .controls { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Квиз-Шпора по Мат. Анализу</h1>
+    
+    <!-- ЭКРАН 1: ВЫБОР ВОПРОСОВ -->
+    <div id="selection-screen">
+        <p style="text-align:center; color:#4a5568;">Отметь вопросы, которые хочешь подтянуть:</p>
+        <div style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
+            <button class="btn btn-secondary" onclick="toggleAll(true)">Выбрать все</button>
+            <button class="btn btn-secondary" onclick="toggleAll(false)">Снять все</button>
+        </div>
+        <div class="selection-list" id="selection-list">
+            <!-- Чекбоксы добавятся через JS -->
+        </div>
+        <div class="controls">
+            <button class="btn" onclick="startSelectedQuiz()" style="font-size: 1.2em; padding: 15px 40px;">Начать тест</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 2: ЧТЕНИЕ И СБОРКА -->
+    <div id="quiz-container" class="hidden">
+        <div class="progress" id="progress-text"></div>
+        <div class="question-title" id="q-title"></div>
+        
+        <div id="learn-mode">
+            <div class="learn-block" id="q-text"></div>
+            <div class="controls">
+                <button class="btn" onclick="startQuiz()">Я запомнил, начать сборку</button>
+                <button class="btn btn-back" onclick="backToMenu()">В меню</button>
+            </div>
+        </div>
+
+        <div id="quiz-mode" class="hidden">
+            <div class="status-msg" id="status"></div>
+            <div class="answer-area" id="answer-area"></div>
+            <div class="pool-area" id="pool-area"></div>
+            
+            <div class="controls">
+                <button class="btn btn-check" onclick="checkAnswer()">Проверить</button>
+                <button class="btn btn-reset" onclick="resetQuiz()">Сбросить</button>
+                <button class="btn btn-back" onclick="goBackToLearn()">Вернуться к тексту</button>
+                <button class="btn hidden" id="next-btn" onclick="nextQuestion()">Следующий вопрос ></button>
+                <button class="btn btn-back" onclick="backToMenu()">В меню</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 3: ЗАВЕРШЕНИЕ -->
+    <div id="finish-screen" class="hidden" style="text-align: center; padding: 40px;">
+        <h2 style="color: #38a169;">🎉 Поздравляем! Ты прошел выбранные вопросы!</h2>
+        <p>Ты настоящий мастер матана. Удачи на коллоквиуме!</p>
+        <div class="controls">
+            <button class="btn" onclick="backToMenu()">Выбрать другие вопросы</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { id: "1.1", title: "Ограниченное сверху (снизу) множество, верхняя (нижняя) граница.", chunks: ["Множество", "$X$", "действительных чисел", "называется ограниченным сверху,", "если", "$\\exists M \\in \\mathbb{R}: x \\le M, \\forall x \\in X$.", "При этом", "$M$", "называется верхней границей.", "Множество", "$X$", "называется ограниченным снизу,", "если", "$\\exists m \\in \\mathbb{R}: x \\ge m, \\forall x \\in X$", "($m$ — нижняя граница).", "Множество ограничено,", "если оно ограничено и сверху, и снизу,", "то есть существуют", "$m$", "и", "$M$,", "такие что", "$m \\le x \\le M$", "для всех", "$x$", "из", "$X$."] },
+        { id: "1.2", title: "Точная верхняя (нижняя) граница.", chunks: ["Если множество", "$X$", "ограничено сверху,", "то наименьшая из его верхних границ", "называется точной верхней границей", "и обозначается", "$\\sup X$.", "Если множество ограничено снизу,", "то наибольшая из его нижних границ", "называется точной нижней границей", "и обозначается", "$\\inf X$."] },
+        { id: "1.3", title: "Критерий точной верхней (нижней) границы.", chunks: ["Пусть", "$X$", "ограничено сверху. Число", "$M$", "является", "$\\sup X$", "тогда и только тогда, когда:", "1) для всех", "$x$", "из", "$X$", "выполняется", "$x \\le M$;", "2) для любого", "$\\varepsilon > 0$", "существует", "$x$", "из", "$X$", "такое, что", "$x > M - \\varepsilon$.", "Пусть", "$X$", "ограничено снизу. Число", "$m$", "является", "$\\inf X$", "тогда и только тогда, когда:", "1) для всех", "$x$", "из", "$X$", "выполняется", "$x \\ge m$;", "2) для любого", "$\\varepsilon > 0$", "существует", "$x$", "из", "$X$", "такое, что", "$x < m + \\varepsilon$."] },
+        { id: "2.1", title: "ε-окрестность точки.", chunks: ["$\\varepsilon$-окрестностью точки", "$a$", "называется интервал", "$U_a(\\varepsilon) = (a - \\varepsilon, a + \\varepsilon)$.", "Это можно записать как", "$\\{x: |x - a| < \\varepsilon\\}$."] },
+        { id: "2.2", title: "Конечный предел последовательности в терминах окрестностей.", chunks: ["Число", "$a$", "называется пределом последовательности", "$(x_n)$,", "если", "$\\forall U_a$", "$\\exists N \\in \\mathbb{N}:$", "$x_n \\in U_a,$", "$\\forall n > N$."] },
+        { id: "2.3", title: "Конечный предел последовательности в терминах внешностей окрестностей.", chunks: ["$\\lim x_n = a \\iff$", "вне любой окрестности точки", "$a$", "лежит лишь конечное число", "членов последовательности."] },
+        { id: "2.4", title: "Конечный предел последовательности в терминах ε-N.", chunks: ["$\\lim x_n = a \\iff$", "$\\forall \\varepsilon > 0$", "$\\exists N \\in \\mathbb{N}:$", "$|x_n - a| < \\varepsilon,$", "$\\forall n > N$."] },
+        { id: "2.5", title: "Понятие сходящейся последовательности.", chunks: ["Последовательность называется сходящейся,", "если она имеет", "конечный предел."] },
+        { id: "3.1", title: "Ограниченные сверху, снизу и ограниченные последовательности.", chunks: ["$(x_n)$", "ограничена сверху,", "если", "$\\exists M: x_n \\le M, \\forall n$.", "Ограничена снизу,", "если", "$\\exists m: x_n \\ge m, \\forall n$.", "Ограничена,", "если она ограничена и сверху, и снизу.", "Эквивалентно:", "$\\exists C > 0: |x_n| \\le C, \\forall n$."] },
+        { id: "3.2", title: "Теорема об ограниченности сходящейся последовательности.", chunks: ["Всякая сходящаяся последовательность", "ограничена."] },
+        { id: "3.3", title: "Понятие подпоследовательности.", chunks: ["Пусть", "$(x_n)$ — последовательность,", "а", "$n_1 < n_2 < n_3 < \\dots$ —", "строго возрастающая последовательность", "натуральных чисел.", "Тогда", "$(x_{n_k})$", "называется подпоследовательностью", "$(x_n)$."] },
+        { id: "3.4", title: "Теорема Больцано-Вейерштрасса.", chunks: ["Из любой ограниченной последовательности", "можно выделить", "сходящуюся подпоследовательность."] },
+        { id: "4.1", title: "Переход к пределу в неравенстве. Замечание о строгом знаке.", chunks: ["Пусть", "$(x_n)$", "и", "$(y_n)$", "сходятся,", "и начиная с некоторого номера", "$x_n \\le y_n$.", "Тогда", "$\\lim x_n \\le \\lim y_n$.", "Замечание:", "если даже неравенство строгое", "($x_n < y_n$),", "в пределе оно может стать нестрогим", "($\\lim x_n \\le \\lim y_n$).", "Строгий знак при переходе к пределу", "не сохраняется."] },
+        { id: "4.2", title: "Теорема о трех последовательностях.", chunks: ["Если", "$(x_n)$", "и", "$(y_n)$", "сходятся к одному и тому же пределу", "$a$,", "и", "$\\exists n_0$,", "начиная с которого", "$x_n \\le z_n \\le y_n$,", "то", "$(z_n)$", "тоже сходится", "и ее предел равен", "$a$."] },
+        { id: "4.3", title: "Теорема об оценке членов сходящейся последовательности.", chunks: ["Если", "$(x_n)$", "сходится и", "$\\lim x_n < b$,", "то", "$\\exists N$,", "начиная с которого", "все члены меньше", "$b$", "($x_n < b$ для $n > N$).", "Аналогично, если", "$\\lim x_n > b$,", "то", "$x_n > b$", "начиная с некоторого номера."] },
+        { id: "5.1", title: "Понятие бесконечно малой последовательности.", chunks: ["Последовательность называется бесконечно малой", "(б.м.),", "если", "$\\lim x_n = 0$,", "т.е.", "$\\forall \\varepsilon > 0 \\ \\exists N:$", "$|x_n| < \\varepsilon, \\forall n > N$."] },
+        { id: "5.2", title: "Теорема о сумме бесконечно малых последовательностей.", chunks: ["Сумма двух б.м. последовательностей", "есть б.м. последовательность."] },
+        { id: "5.3", title: "Теорема о произведении бесконечно малой на ограниченную.", chunks: ["Произведение б.м. последовательности", "на ограниченную", "есть б.м. последовательность."] },
+        { id: "5.4", title: "Следствие о произведении бесконечно малой на сходящуюся.", chunks: ["Произведение б.м. последовательности", "на сходящуюся", "есть б.м. последовательность", "(т.к. сходящаяся ограничена)."] },
+        { id: "5.5", title: "Теорема о связи между бесконечно малыми и сходящимися.", chunks: ["$(x_n)$", "сходится к", "$a \\iff$", "$(x_n - a)$", "является б.м."] },
+        { id: "6.1", title: "Определение бесконечно больших последовательностей.", chunks: ["1) Бесконечно большая положительная", "($\\lim x_n = +\\infty$):", "$\\forall E > 0 \\ \\exists N:$", "$x_n > E, \\forall n > N$.", "2) Бесконечно большая отрицательная", "($\\lim x_n = -\\infty$):", "$\\forall E > 0 \\ \\exists N:$", "$x_n < -E, \\forall n > N$.", "3) Бесконечно большая", "($\\lim x_n = \\infty$):", "$\\forall E > 0 \\ \\exists N:$", "$|x_n| > E, \\forall n > N$."] },
+        { id: "6.2", title: "Теорема о сумме бесконечно больших последовательностей.", chunks: ["Сумма двух б.б. последовательностей", "одного знака", "есть б.б. последовательность", "того же знака.", "(Для разных знаков это неверно,", "возникает неопределенность", "$\\infty - \\infty$)."] },
+        { id: "6.3", title: "Теорема о сумме бесконечно большой и ограниченной. Следствие.", chunks: ["Сумма б.б. последовательности", "и ограниченной", "есть б.б. последовательность", "(того же знака).", "Следствие:", "если", "$x_n \\to +\\infty$,", "а", "$y_n$", "ограничена,", "то", "$x_n + y_n \\to +\\infty$;", "если", "$x_n \\to -\\infty$,", "то", "$x_n + y_n \\to -\\infty$."] },
+        { id: "6.4", title: "Теорема о связи между бесконечно большими и бесконечно малыми.", chunks: ["Пусть", "$x_n \\neq 0, \\forall n$.", "Тогда", "$(x_n)$", "является б.б.", "$\\iff$", "$(1/x_n)$", "является б.м."] },
+        { id: "7.1", title: "Понятия предельной и изолированной точки множества.", chunks: ["Точка", "$a$", "(не обязательно принадлежащая", "$X$)", "называется предельной точкой множества", "$X$,", "если в любой ее окрестности", "есть хотя бы одна точка множества", "$X$,", "отличная от", "$a$.", "Точка", "$a \\in X$", "называется изолированной,", "если", "$\\exists$", "такая ее окрестность,", "в которой нет других точек", "$X$,", "кроме самой", "$a$."] },
+        { id: "7.2", title: "Проколотая окрестность точки.", chunks: ["Проколотой окрестностью точки", "$a$", "называется обычная окрестность", "без самой точки", "$a$.", "Обозначается", "$\\dot{U}_a$", "или", "$\\{x: 0 < |x - a| < \\varepsilon\\}$."] },
+        { id: "7.3", title: "Понятие предела функции в точке в терминах окрестностей.", chunks: ["Число", "$A$", "называется пределом", "$f(x)$", "в точке", "$a$,", "если", "$\\forall$ окрестности точки", "$A$", "$\\exists$ такая проколотая окрестность точки", "$a$,", "что", "$\\forall x$", "из этой проколотой окрестности", "$f(x)$", "принадлежат окрестности точки", "$A$."] },
+        { id: "7.4", title: "Понятие предела функции на языке неравенств.", chunks: ["1) Для конечных", "$a$", "и", "$A$:", "$\\forall \\varepsilon > 0 \\ \\exists \\delta > 0:$", "$0 < |x - a| < \\delta \\implies |f(x) - A| < \\varepsilon$.", "2) Для", "$a = +\\infty$,", "$A$", "конечного:", "$\\forall \\varepsilon > 0 \\ \\exists \\Delta > 0:$", "$x > \\Delta \\implies |f(x) - A| < \\varepsilon$.", "3) Для", "$a$", "конечного,", "$A = +\\infty$:", "$\\forall E > 0 \\ \\exists \\delta > 0:$", "$0 < |x - a| < \\delta \\implies f(x) > E$.", "(Аналогично для других комбинаций)."] },
+        { id: "8.1", title: "Теорема о локальной ограниченности функции, имеющей предел.", chunks: ["Если", "$f(x)$", "имеет конечный предел в точке", "$a$,", "то она локально ограничена", "в этой точке", "(т.е. $\\exists$ окрестность точки", "$a$", "и числа", "$m, M:$", "$m \\le f(x) \\le M$", "для всех", "$x$", "из этой окрестности)."] },
+        { id: "8.2", title: "Теорема о переходе к пределу в неравенствах для функций.", chunks: ["Если в некоторой проколотой окрестности точки", "$a$", "выполняется", "$f(x) \\le g(x)$,", "и обе функции имеют конечные пределы", "в точке", "$a$,", "то", "$\\lim f(x) \\le \\lim g(x)$."] },
+        { id: "8.3", title: "Теорема о трех функциях.", chunks: ["Если в некоторой проколотой окрестности точки", "$a$", "выполняется", "$f(x) \\le h(x) \\le g(x)$,", "и", "$\\lim f(x) = \\lim g(x) = A$,", "то", "$\\lim h(x) = A$."] },
+        { id: "8.4", title: "Теорема об оценке функции через предел.", chunks: ["Если", "$\\lim f(x) = A$", "(конечному) и", "$A > B$,", "то", "$\\exists$", "проколотая окрестность точки", "$a$,", "в которой", "$f(x) > B$.", "(Аналогично для $A < B$)."] },
+        { id: "9.1", title: "Понятие предельной точки слева (справа). Двусторонняя предельная точка.", chunks: ["Точка", "$a$", "называется предельной точкой", "$X$", "справа (слева),", "если в любом интервале", "$(a, a+\\delta)$", "(соответственно", "$(a-\\delta, a)$)", "есть точки", "$X$.", "Если точка предельная и слева, и справа —", "она двусторонняя."] },
+        { id: "9.2", title: "Критерий существования предела в двусторонней предельной точке.", chunks: ["Предел", "$f(x)$", "в точке", "$a$", "существует и равен", "$A \\iff$", "существуют пределы слева и справа,", "и оба равны", "$A$", "($\\lim_{x\\to a-0} f(x) = \\lim_{x\\to a+0} f(x) = A$)."] },
+        { id: "9.3", title: "Теорема о существовании предела монотонной функции.", chunks: ["Если функция монотонна на", "$(a, b)$,", "то в точках", "$a$", "и", "$b$", "всегда существуют", "односторонние пределы", "(конечные или бесконечные).", "Если возрастает:", "$\\lim_{x\\to a+} f(x) = \\inf f(x)$,", "$\\lim_{x\\to b-} f(x) = \\sup f(x)$", "(если ограничена сверху;", "если нет — предел", "$+\\infty$).", "Если убывает — наоборот."] },
+        { id: "10.1", title: "Понятие непрерывной функции в точке и на множестве.", chunks: ["$f(x)$", "называется непрерывной в точке", "$a \\in X$,", "если", "$\\forall \\varepsilon > 0 \\ \\exists \\delta > 0:$", "$\\forall x \\in X, |x - a| < \\delta$", "$\\implies |f(x) - f(a)| < \\varepsilon$.", "Непрерывна на множестве,", "если непрерывна в каждой его точке."] },
+        { id: "10.2", title: "Условие непрерывности функции в точке, являющейся предельной.", chunks: ["Если", "$a$", "— предельная точка области определения,", "то", "$f$", "непрерывна в ней", "$\\iff$", "$\\lim_{x\\to a} f(x) = f(a)$."] },
+        { id: "10.3", title: "Теорема об арифметических операциях с непрерывными функциями.", chunks: ["Если", "$f$", "и", "$g$", "непрерывны в точке", "$a$,", "то", "$f \\pm g$,", "$c \\cdot f$,", "$f \\cdot g$", "также непрерывны в", "$a$.", "Если", "$g(a) \\neq 0$,", "то частное", "$f/g$", "также непрерывно в", "$a$."] },
+        { id: "10.4", title: "Теорема о непрерывности композиции.", chunks: ["Если", "$\\varphi(x)$", "непрерывна в точке", "$a$,", "а", "$f(y)$", "непрерывна в точке", "$b = \\varphi(a)$,", "то сложная функция", "$f(\\varphi(x))$", "непрерывна в точке", "$a$."] },
+        { id: "11.1", title: "Первая теорема Вейерштрасса.", chunks: ["Если функция непрерывна на отрезке,", "то она ограничена", "на этом отрезке."] },
+        { id: "11.2", title: "Вторая теорема Вейерштрасса.", chunks: ["Если функция непрерывна на отрезке,", "то она достигает на нем", "своих точных верхней и нижней граней", "(т.е. $\\exists$ точки,", "где функция принимает значения", "$\\sup$", "и", "$\\inf$)."] },
+        { id: "11.3", title: "Теорема об обращении непрерывной на отрезке функции в нуль.", chunks: ["Если", "$f(x)$", "непрерывна на", "$[a, b]$", "и на концах принимает", "значения разных знаков", "($f(a) \\cdot f(b) < 0$),", "то", "$\\exists$ точка", "$c$", "внутри отрезка,", "в которой", "$f(c) = 0$."] },
+        { id: "11.4", title: "Теорема Больцано-Коши о промежуточных значениях.", chunks: ["Если функция непрерывна на", "$[a, b]$,", "$m$ — ее минимальное значение,", "$M$ — максимальное,", "то", "$\\forall d \\in [m, M]$", "$\\exists c \\in [a, b]:$", "$f(c) = d$."] }
+    ];
+
+    let activeQuizData = [];
+    let currentQuestionIndex = 0;
+    let originalChunks = [];
+    let shuffledChunks = [];
+    let currentAnswer = [];
+
+    // Запуск при загрузке
+    window.onload = initApp;
+
+    function initApp() {
+        const list = document.getElementById('selection-list');
+        list.innerHTML = "";
+        
+        quizData.forEach((q, index) => {
+            const div = document.createElement('div');
+            div.className = 'selection-item';
+            div.innerHTML = `<input type="checkbox" id="chk-${index}" value="${index}" checked>
+                             <label for="chk-${index}"><b>${q.id}.</b> ${q.title}</label>`;
+            list.appendChild(div);
+        });
+        MathJax.typesetPromise();
+    }
+
+    function toggleAll(state) {
+        document.querySelectorAll('#selection-list input[type="checkbox"]').forEach(cb => cb.checked = state);
+    }
+
+    function startSelectedQuiz() {
+        const checkedBoxes = document.querySelectorAll('#selection-list input[type="checkbox"]:checked');
+        
+        if (checkedBoxes.length === 0) {
+            alert("Выбери хотя бы один вопрос!");
+            return;
+        }
+
+        // Формируем массив только из выбранных вопросов
+        activeQuizData = Array.from(checkedBoxes).map(cb => quizData[parseInt(cb.value)]);
+        currentQuestionIndex = 0;
+
+        document.getElementById('selection-screen').classList.add('hidden');
+        document.getElementById('finish-screen').classList.add('hidden');
+        document.getElementById('quiz-container').classList.remove('hidden');
+        
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentQuestionIndex >= activeQuizData.length) {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('finish-screen').classList.remove('hidden');
+            return;
+        }
+
+        const q = activeQuizData[currentQuestionIndex];
+        document.getElementById('progress-text').innerText = `Вопрос ${currentQuestionIndex + 1} из ${activeQuizData.length}`;
+        document.getElementById('q-title').innerText = q.id + ". " + q.title;
+        document.getElementById('q-text').innerHTML = q.chunks.join(" ");
+        
+        document.getElementById('learn-mode').classList.remove('hidden');
+        document.getElementById('quiz-mode').classList.add('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+        document.getElementById('status').innerText = "";
+        
+        MathJax.typesetPromise();
+    }
+
+    function startQuiz() {
+        const q = activeQuizData[currentQuestionIndex];
+        originalChunks = [...q.chunks];
+        
+        shuffledChunks = q.chunks.map((text, index) => ({ text, originalIndex: index, used: false }));
+        for (let i = shuffledChunks.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledChunks[i], shuffledChunks[j]] = [shuffledChunks[j], shuffledChunks[i]];
+        }
+        
+        currentAnswer = [];
+        
+        document.getElementById('learn-mode').classList.add('hidden');
+        document.getElementById('quiz-mode').classList.remove('hidden');
+        
+        renderPool();
+        renderAnswerArea();
+    }
+
+    function goBackToLearn() {
+        document.getElementById('quiz-mode').classList.add('hidden');
+        document.getElementById('learn-mode').classList.remove('hidden');
+        document.getElementById('status').innerText = "";
+        MathJax.typesetPromise();
+    }
+
+    function backToMenu() {
+        document.getElementById('quiz-container').classList.add('hidden');
+        document.getElementById('finish-screen').classList.add('hidden');
+        document.getElementById('selection-screen').classList.remove('hidden');
+    }
+
+    function renderPool() {
+        const pool = document.getElementById('pool-area');
+        pool.innerHTML = "";
+        
+        shuffledChunks.forEach((chunk, i) => {
+            if (chunk.used) return; 
+            
+            const btn = document.createElement('div');
+            btn.className = 'word-btn';
+            btn.innerHTML = chunk.text;
+            btn.onclick = () => moveToAnswer(chunk, i);
+            pool.appendChild(btn);
+        });
+        MathJax.typesetPromise();
+    }
+
+    function renderAnswerArea() {
+        const area = document.getElementById('answer-area');
+        area.innerHTML = "";
+        
+        currentAnswer.forEach((chunk, i) => {
+            const btn = document.createElement('div');
+            btn.className = 'word-btn';
+            btn.innerHTML = chunk.text;
+            btn.onclick = () => removeFromAnswer(chunk, i);
+            area.appendChild(btn);
+        });
+        MathJax.typesetPromise();
+    }
+
+    function moveToAnswer(chunk, poolIndex) {
+        chunk.used = true;
+        currentAnswer.push(chunk);
+        renderPool();
+        renderAnswerArea();
+    }
+
+    function removeFromAnswer(chunk, answerIndex) {
+        chunk.used = false;
+        currentAnswer.splice(answerIndex, 1);
+        renderPool();
+        renderAnswerArea();
+    }
+
+    function checkAnswer() {
+        const status = document.getElementById('status');
+        if (currentAnswer.length !== originalChunks.length) {
+            status.innerText = "Вы собрали не все слова!";
+            status.className = "status-msg status-wrong";
+            return;
+        }
+
+        let isCorrect = true;
+        for (let i = 0; i < originalChunks.length; i++) {
+            if (currentAnswer[i].text !== originalChunks[i]) {
+                isCorrect = false;
+                break;
+            }
+        }
+
+        if (isCorrect) {
+            status.innerText = "Абсолютно верно! 🎉";
+            status.className = "status-msg status-correct";
+            
+            document.querySelectorAll('#answer-area .word-btn').forEach(btn => {
+                btn.classList.add('correct');
+                btn.onclick = null; 
+            });
+            
+            document.getElementById('next-btn').classList.remove('hidden');
+        } else {
+            status.innerText = "Есть ошибки. Проверь порядок или нажми «Вернуться к тексту»!";
+            status.className = "status-msg status-wrong";
+        }
+    }
+
+    function resetQuiz() {
+        shuffledChunks.forEach(c => c.used = false);
+        for (let i = shuffledChunks.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledChunks[i], shuffledChunks[j]] = [shuffledChunks[j], shuffledChunks[i]];
+        }
+        currentAnswer = [];
+        document.getElementById('status').innerText = "";
+        document.getElementById('next-btn').classList.add('hidden');
+        renderPool();
+        renderAnswerArea();
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+</script>
+
+</body>
+</html>
