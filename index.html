@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Квиз: Мат. Анализ 1 Семестр</title>
+    <title>Квиз Мат. Анализ</title>
     <script>
         MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
@@ -12,57 +12,440 @@
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #1a365d; margin-bottom: 10px; }
-        .progress { text-align: center; color: #718096; margin-bottom: 30px; font-weight: bold; }
-        .question-title { font-weight: bold; font-size: 1.2em; color: #2b6cb0; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-        
-        .selection-list { max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 20px; background: #f8fafc; }
-        .selection-item { padding: 8px; border-bottom: 1px solid #edf2f7; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.1s; }
-        .selection-item:hover { background: #e2e8f0; }
-        .selection-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
-        .selection-item label { cursor: pointer; flex-grow: 1; font-size: 1.05em; }
+        :root {
+            --bg: #f5f7fa;
+            --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #e9eef5 100%);
+            --card-bg: #ffffff;
+            --text: #1a202c;
+            --text-muted: #718096;
+            --text-soft: #4a5568;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e0;
+            --accent: #4299e1;
+            --accent-hover: #2b6cb0;
+            --accent-soft: #ebf4ff;
+            --accent-grad: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            --success: #48bb78;
+            --success-hover: #2f855a;
+            --success-bg: #c6f6d5;
+            --success-text: #22543d;
+            --danger: #e53e3e;
+            --danger-bg: #fed7d7;
+            --danger-text: #742a2a;
+            --warning: #ed8936;
+            --warning-hover: #dd6b20;
+            --secondary: #e2e8f0;
+            --secondary-hover: #cbd5e0;
+            --secondary-text: #4a5568;
+            --word-bg: #edf2f7;
+            --word-hover: #e2e8f0;
+            --word-border: #d5dee8;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.12);
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
 
-        .learn-block { background: #f7fafc; padding: 20px; border-left: 4px solid #4299e1; border-radius: 4px; margin-bottom: 20px; line-height: 1.6; font-size: 1.1em; }
-        .btn { background: #4299e1; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: bold; transition: 0.2s; }
-        .btn:hover { background: #2b6cb0; }
-        .btn-check { background: #48bb78; }
-        .btn-check:hover { background: #2f855a; }
-        .btn-reset { background: #ed8936; }
-        .btn-reset:hover { background: #dd6b20; }
-        .btn-back { background: #a0aec0; }
-        .btn-back:hover { background: #718096; }
-        .btn-secondary { background: #e2e8f0; color: #4a5568; }
-        .btn-secondary:hover { background: #cbd5e0; }
-        
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-grad: linear-gradient(135deg, #0f172a 0%, #1a2540 100%);
+            --card-bg: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --text-soft: #cbd5e0;
+            --border: #334155;
+            --border-strong: #475569;
+            --accent: #63b3ed;
+            --accent-hover: #90cdf4;
+            --accent-soft: #1e3a5f;
+            --accent-grad: linear-gradient(135deg, #667eea 0%, #4299e1 100%);
+            --success: #68d391;
+            --success-hover: #9ae6b4;
+            --success-bg: #22543d;
+            --success-text: #c6f6d5;
+            --danger: #fc8181;
+            --danger-bg: #742a2a;
+            --danger-text: #fed7d7;
+            --warning: #f6ad55;
+            --warning-hover: #fbd38d;
+            --secondary: #334155;
+            --secondary-hover: #475569;
+            --secondary-text: #cbd5e0;
+            --word-bg: #273449;
+            --word-hover: #334155;
+            --word-border: #475569;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-grad);
+            background-attachment: fixed;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.9em;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin: 0 0 10px;
+            background: var(--accent-grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            font-weight: 600;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+        }
+
+        .question-title {
+            font-weight: 700;
+            font-size: 1.15em;
+            color: var(--accent);
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+            line-height: 1.4;
+        }
+
+        .selection-list {
+            max-height: 420px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 8px;
+            margin-bottom: 22px;
+            background: var(--bg);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .selection-list::-webkit-scrollbar { width: 8px; }
+        .selection-list::-webkit-scrollbar-track { background: transparent; }
+        .selection-list::-webkit-scrollbar-thumb {
+            background: var(--border-strong);
+            border-radius: 4px;
+        }
+
+        .selection-item {
+            padding: 10px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            margin-bottom: 2px;
+        }
+        .selection-item:hover { background: var(--word-bg); }
+        .selection-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+        }
+        .selection-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 1em;
+            color: var(--text);
+            line-height: 1.35;
+        }
+
+        .learn-block {
+            background: var(--accent-soft);
+            padding: 22px;
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            margin-bottom: 22px;
+            line-height: 1.7;
+            font-size: 1.08em;
+            color: var(--text);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.98em;
+            font-weight: 600;
+            transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 6px rgba(66, 153, 225, 0.3);
+            letter-spacing: 0.2px;
+        }
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(66, 153, 225, 0.4);
+        }
+        .btn:active { transform: translateY(0); }
+
+        .btn-check {
+            background: var(--success);
+            box-shadow: 0 2px 6px rgba(72, 187, 120, 0.3);
+        }
+        .btn-check:hover {
+            background: var(--success-hover);
+            box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-reset {
+            background: var(--warning);
+            box-shadow: 0 2px 6px rgba(237, 137, 54, 0.3);
+        }
+        .btn-reset:hover {
+            background: var(--warning-hover);
+            box-shadow: 0 6px 16px rgba(237, 137, 54, 0.4);
+        }
+
+        .btn-back {
+            background: var(--secondary);
+            color: var(--secondary-text);
+            box-shadow: none;
+        }
+        .btn-back:hover {
+            background: var(--secondary-hover);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--secondary-text);
+            box-shadow: none;
+            padding: 10px 20px;
+            font-size: 0.9em;
+        }
+        .btn-secondary:hover {
+            background: var(--secondary-hover);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
         .hidden { display: none !important; }
-        .answer-area { min-height: 100px; border: 2px dashed #cbd5e0; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; background: #fff; align-items: flex-start; align-content: flex-start; }
-        .pool-area { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-        .word-btn { background: #e2e8f0; border: 1px solid #cbd5e0; padding: 8px 12px; border-radius: 6px; cursor: pointer; user-select: none; font-size: 1.05em; display: inline-block; transition: 0.1s; }
-        .word-btn:hover { background: #cbd5e0; }
-        .word-btn.correct { background: #c6f6d5; border-color: #68d391; color: #22543d; cursor: default; pointer-events: none; }
-        .word-btn.wrong { background: #fed7d7; border-color: #f56565; color: #742a2a; }
-        .status-msg { font-weight: bold; margin-bottom: 15px; text-align: center; font-size: 1.2em; }
-        .status-correct { color: #38a169; }
-        .status-wrong { color: #e53e3e; }
-        .controls { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+
+        .answer-area {
+            min-height: 110px;
+            border: 2px dashed var(--border-strong);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: var(--bg);
+            align-items: flex-start;
+            align-content: flex-start;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .answer-area.drop-active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .pool-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 4px;
+            border-radius: 10px;
+            transition: box-shadow 0.15s;
+        }
+
+        .pool-area.drop-active {
+            box-shadow: 0 0 0 3px var(--warning);
+        }
+
+        .answer-placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.92em;
+            width: 100%;
+            text-align: center;
+            align-self: center;
+            pointer-events: none;
+            user-select: none;
+            padding: 20px 0;
+        }
+
+        .word-btn {
+            background: var(--word-bg);
+            border: 1px solid var(--word-border);
+            padding: 9px 14px;
+            border-radius: 10px;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            font-size: 1em;
+            display: inline-block;
+            transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+            color: var(--text);
+            line-height: 1.4;
+            touch-action: none;
+        }
+        .word-btn:hover {
+            background: var(--word-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        }
+        .word-btn:active { cursor: grabbing; }
+        .word-btn.correct {
+            background: var(--success-bg);
+            border-color: var(--success);
+            color: var(--success-text);
+            cursor: default;
+            pointer-events: none;
+            box-shadow: 0 2px 8px rgba(72, 187, 120, 0.25);
+        }
+
+        .drop-line {
+            width: 3px;
+            align-self: stretch;
+            background: var(--accent);
+            border-radius: 2px;
+            margin: 0 2px;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px var(--accent);
+            animation: dropPulse 0.8s ease-in-out infinite;
+        }
+
+        @keyframes dropPulse {
+            0%, 100% { opacity: 0.55; }
+            50% { opacity: 1; }
+        }
+
+        .status-msg {
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 1.1em;
+            min-height: 1.5em;
+            transition: color 0.2s;
+        }
+        .status-correct { color: var(--success); }
+        .status-wrong { color: var(--danger); }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hint {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85em;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, background 0.3s, box-shadow 0.2s;
+            z-index: 1000;
+            padding: 0;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.08) rotate(15deg);
+            box-shadow: var(--shadow-hover);
+        }
+        .theme-toggle:active { transform: scale(0.95); }
+        .theme-toggle svg {
+            width: 22px;
+            height: 22px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .theme-toggle .icon-sun { display: none; }
+        .theme-toggle .icon-moon { display: block; }
+        [data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+        [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .container { padding: 20px; border-radius: 16px; }
+            h1 { font-size: 1.5em; }
+            .theme-toggle { top: 12px; right: 12px; width: 42px; height: 42px; }
+            .controls { gap: 8px; }
+            .btn { padding: 11px 18px; font-size: 0.92em; }
+        }
     </style>
 </head>
 <body>
 
+<button class="theme-toggle" id="theme-toggle" aria-label="Переключить тему" title="Переключить тему">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+</button>
+
 <div class="container">
-    <h1>Квиз-Шпора по Мат. Анализу</h1>
+    <h1>Квиз Мат. Анализ</h1>
     
     <div id="selection-screen">
-        <p style="text-align:center; color:#4a5568;">Отметь вопросы, которые хочешь подтянуть:</p>
+        <p style="text-align:center; color:var(--text-muted); margin-bottom:16px;">Отметь вопросы, которые хочешь подтянуть:</p>
         <div style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
             <button class="btn btn-secondary" onclick="toggleAll(true)">Выбрать все</button>
             <button class="btn btn-secondary" onclick="toggleAll(false)">Снять все</button>
         </div>
         <div class="selection-list" id="selection-list"></div>
         <div class="controls">
-            <button class="btn" onclick="startSelectedQuiz()" style="font-size: 1.2em; padding: 15px 40px;">Начать тест</button>
+            <button class="btn" onclick="startSelectedQuiz()" style="font-size: 1.1em; padding: 15px 40px;">Начать тест</button>
         </div>
     </div>
 
@@ -80,6 +463,7 @@
 
         <div id="quiz-mode" class="hidden">
             <div class="status-msg" id="status"></div>
+            <div class="hint" id="hint">Перетаскивайте слова или нажимайте на них</div>
             <div class="answer-area" id="answer-area"></div>
             <div class="pool-area" id="pool-area"></div>
             
@@ -87,15 +471,15 @@
                 <button class="btn btn-check" onclick="checkAnswer()">Проверить</button>
                 <button class="btn btn-reset" onclick="resetQuiz()">Сбросить</button>
                 <button class="btn btn-back" onclick="goBackToLearn()">Вернуться к тексту</button>
-                <button class="btn hidden" id="next-btn" onclick="nextQuestion()">Следующий вопрос ></button>
+                <button class="btn hidden" id="next-btn" onclick="nextQuestion()">Следующий вопрос →</button>
                 <button class="btn btn-back" onclick="backToMenu()">В меню</button>
             </div>
         </div>
     </div>
 
-    <div id="finish-screen" class="hidden" style="text-align: center; padding: 40px;">
-        <h2 style="color: #38a169;">🎉 Поздравляем! Ты прошел выбранные вопросы!</h2>
-        <p>Ты настоящий мастер матана. Удачи на коллоквиуме!</p>
+    <div id="finish-screen" class="hidden" style="text-align: center; padding: 40px 20px;">
+        <h2 style="color: var(--success); margin-bottom: 12px;">🎉 Поздравляем! Ты прошел выбранные вопросы!</h2>
+        <p style="color: var(--text-soft);">Ты настоящий мастер матана. Удачи на коллоквиуме!</p>
         <div class="controls">
             <button class="btn" onclick="backToMenu()">Выбрать другие вопросы</button>
         </div>
@@ -103,33 +487,55 @@
 </div>
 
 <script>
+    // === Тема ===
+    (function initTheme() {
+        const saved = localStorage.getItem('quiz-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('quiz-theme', next);
+    });
+
+    // === Безопасный вызов MathJax ===
+    function typeset() {
+        if (window.MathJax && MathJax.typesetPromise) {
+            MathJax.typesetPromise().catch(() => {});
+        }
+    }
+
     const quizData = [
         { id: "1.1", title: "Ограниченное сверху (снизу) множество, верхняя (нижняя) граница.", chunks: [
-            "Множество", "$X$", "действительных чисел", "называется ограниченным сверху,", "если", "$\\exists M \\in \\mathbb{R}: x \\le M, \\forall x \\in X$.", "При этом", "$M$", "называется верхней границей.", "$X$", "называется ограниченным снизу,", "если", "$\\exists m \\in \\mathbb{R}: x \\ge m, \\forall x \\in X$", "($m$ — нижняя граница).", "Множество ограничено,", "если оно ограничено и сверху, и снизу,", "т.е.", "$\\exists m, M \\in \\mathbb{R}: m \\le x \\le M, \\forall x \\in X$.", "Смысл: все элементы лежат в полупрямой/отрезке."
+            "Множество", "$X$", "действительных чисел", "называется ограниченным сверху,", "если", "$\\exists M \\in \\mathbb{R}\\ \\forall x \\in X:\\ x \\le M$.", "При этом", "$M$", "называется верхней границей.", "$X$", "называется ограниченным снизу,", "если", "$\\exists m \\in \\mathbb{R}\\ \\forall x \\in X:\\ x \\ge m$", "($m$ — нижняя граница).", "Множество ограничено,", "если оно ограничено и сверху, и снизу,", "т.е.", "$\\exists m, M \\in \\mathbb{R}\\ \\forall x \\in X:\\ m \\le x \\le M$.", "Смысл: все элементы лежат в полупрямой/отрезке."
         ] },
         { id: "1.2", title: "Точная верхняя (нижняя) граница.", chunks: [
             "Если $X$ ограничено сверху,", "то наименьшая из его верхних границ", "называется точной верхней границей", "и обозначается", "$\\sup X$.", "Если $X$ ограничено снизу,", "то наибольшая из его нижних границ", "называется точной нижней границей", "и обозначается", "$\\inf X$.", "Смысл: наименьшая верхняя/наибольшая нижняя граница."
         ] },
         { id: "1.3", title: "Критерий точной верхней (нижней) границы.", chunks: [
-            "Пусть $X$ ограничено сверху.", "Число $M$ является", "$\\sup X$", "$\\iff$", "(1)", "$x \\le M, \\forall x \\in X$;", "(2)", "$\\forall \\varepsilon > 0 \\ \\exists x \\in X : x > M - \\varepsilon$.", "Пусть $X$ ограничено снизу.", "Число $m$ является", "$\\inf X$", "$\\iff$", "(1)", "$x \\ge m, \\forall x \\in X$;", "(2)", "$\\forall \\varepsilon > 0 \\ \\exists x \\in X : x < m + \\varepsilon$.", "Смысл: граница достижима с любой точностью."
+            "Пусть $X$ ограничено сверху.", "Число $M$ является", "$\\sup X$", "$\\iff$", "(1)", "$\\forall x \\in X:\\ x \\le M$;", "(2)", "$\\forall \\varepsilon > 0 \\ \\exists x \\in X:\\ x > M - \\varepsilon$.", "Пусть $X$ ограничено снизу.", "Число $m$ является", "$\\inf X$", "$\\iff$", "(1)", "$\\forall x \\in X:\\ x \\ge m$;", "(2)", "$\\forall \\varepsilon > 0 \\ \\exists x \\in X:\\ x < m + \\varepsilon$.", "Смысл: граница достижима с любой точностью."
         ] },
         { id: "2.1", title: "ε-окрестность точки.", chunks: [
             "$\\varepsilon$-окрестностью точки", "$a$", "называется интервал", "$U_a(\\varepsilon) = (a - \\varepsilon, a + \\varepsilon)$.", "Это можно записать как", "$\\{x: |x - a| < \\varepsilon\\}$.", "Смысл: интервал вокруг $a$."
         ] },
         { id: "2.2", title: "Конечный предел последовательности в терминах окрестностей.", chunks: [
-            "Число", "$a$", "называется пределом", "$(x_n)$,", "если", "$\\forall U_a$", "$\\exists N \\in \\mathbb{N}:$", "$x_n \\in U_a,$", "$\\forall n > N$.", "Смысл: члены попадают в любую окрестность $a$."
+            "Число", "$a$", "называется пределом", "$(x_n)$,", "если", "$\\forall U_a$", "$\\exists N \\in \\mathbb{N}$", "$\\forall n\\in\\mathbb{N}\\ (n > N):$", "$x_n \\in U_a$.", "Смысл: члены попадают в любую окрестность $a$."
         ] },
         { id: "2.3", title: "Конечный предел в терминах внешности окрестностей.", chunks: [
             "$\\lim x_n = a \\iff$", "вне любой окрестности точки", "$a$", "лежит лишь конечное число", "членов последовательности."
         ] },
         { id: "2.4", title: "Конечный предел в терминах ε-N.", chunks: [
-            "$\\lim x_n = a \\iff$", "$\\forall \\varepsilon > 0$", "$\\exists N \\in \\mathbb{N}:$", "$|x_n - a| < \\varepsilon,$", "$\\forall n > N$.", "Смысл: начиная с некоторого номера отклонение меньше $\\varepsilon$."
+            "$\\lim x_n = a \\iff$", "$\\forall \\varepsilon > 0$", "$\\exists N \\in \\mathbb{N}$", "$\\forall n\\in\\mathbb{N}\\ (n > N):$", "$|x_n - a| < \\varepsilon$.", "Смысл: начиная с некоторого номера отклонение меньше $\\varepsilon$."
         ] },
         { id: "2.5", title: "Понятие сходящейся последовательности.", chunks: [
             "Последовательность называется сходящейся,", "если она имеет", "конечный предел.", "В ином случае —", "расходящаяся."
         ] },
         { id: "3.1", title: "Ограниченные сверху, снизу и ограниченные числовые последовательности.", chunks: [
-            "$(x_n)$", "ограничена сверху,", "если", "$\\exists M: x_n \\le M, \\forall n$.", "Ограничена снизу,", "если", "$\\exists m: x_n \\ge m, \\forall n$.", "Ограничена,", "если она ограничена и сверху, и снизу.", "Эквивалентно:", "$\\exists C > 0: |x_n| \\le C, \\forall n$.", "Смысл: все члены лежат в полупрямой/полосе."
+            "$(x_n)$", "ограничена сверху,", "если", "$\\exists M\\in\\mathbb{R}\\ \\forall n\\in\\mathbb{N}:\\ x_n \\le M$.", "Ограничена снизу,", "если", "$\\exists m\\in\\mathbb{R}\\ \\forall n\\in\\mathbb{N}:\\ x_n \\ge m$.", "Ограничена,", "если она ограничена и сверху, и снизу.", "Эквивалентно:", "$\\exists C > 0\\ \\forall n\\in\\mathbb{N}:\\ |x_n| \\le C$.", "Смысл: все члены лежат в полупрямой/полосе."
         ] },
         { id: "3.2", title: "Теорема об ограниченности сходящейся последовательности.", chunks: [
             "Всякая сходящаяся последовательность", "ограничена."
@@ -141,16 +547,16 @@
             "Из любой ограниченной последовательности", "можно выделить", "сходящуюся подпоследовательность."
         ] },
         { id: "4.1", title: "Теорема о переходе к пределу в неравенстве. Замечание о строгом знаке.", chunks: [
-            "Пусть", "$(x_n)$", "и", "$(y_n)$", "сходятся,", "и начиная с некоторого номера", "$x_n \\le y_n$.", "Тогда", "$\\lim x_n \\le \\lim y_n$.", "Замечание:", "если даже неравенство строгое", "($x_n < y_n$),", "в пределе оно может стать нестрогим", "($\\lim x_n \\le \\lim y_n$)."
+            "Пусть", "$(x_n)$", "и", "$(y_n)$", "сходятся,", "и", "$x_n \\le y_n$", "начиная с некоторого номера", "$n_0$,", "т.е.", "$\\exists n_0\\in\\mathbb{N}\\ \\forall n\\in\\mathbb{N}\\ (n > n_0):\\ x_n \\le y_n$.", "Тогда", "$\\lim x_n \\le \\lim y_n$.", "Замечание:", "если даже неравенство строгое", "($x_n < y_n$),", "в пределе оно может стать нестрогим", "($\\lim x_n \\le \\lim y_n$)."
         ] },
         { id: "4.2", title: "Теорема о трех последовательностях.", chunks: [
-            "Если", "$x_n \\to a$,", "$y_n \\to a$", "и существует номер", "$n_0$", "такой, что для всех", "$n \\ge n_0$", "выполняется", "$x_n \\le z_n \\le y_n$,", "то", "$(z_n)$", "тоже сходится", "и", "$\\lim z_n = a$.", "Смысл: зажатая последовательность имеет тот же предел."
+            "Если", "$x_n \\to a$,", "$y_n \\to a$", "и существует номер", "$n_0$", "такой, что для всех", "$n \\ge n_0$", "выполняется", "$x_n \\le z_n \\le y_n$,", "то последовательность", "$(z_n)$", "тоже сходится", "и", "$\\lim_{n\\to\\infty} z_n = a$.", "Смысл: зажатая последовательность имеет тот же предел.", "$\\exists n_0\\ \\forall n\\ge n_0:\\ x_n\\le z_n\\le y_n,\\ x_n\\to a,\\ y_n\\to a \\ \\Rightarrow\\ z_n\\to a$."
         ] },
         { id: "4.3", title: "Теорема об оценке членов сходящейся последовательности.", chunks: [
-            "Если", "$(x_n)$", "сходится и", "$\\lim x_n < b$,", "то", "$\\exists N \\ \\forall n > N :$", "$x_n < b$.", "Аналогично, если", "$\\lim x_n > b$,", "то", "$\\exists N \\ \\forall n > N :$", "$x_n > b$.", "Смысл: $\\lim x_n < b \\Rightarrow x_n < b$ локально;", "$\\lim x_n > b \\Rightarrow x_n > b$ локально."
+            "Если", "$(x_n)$", "сходится и", "$\\lim x_n < b$,", "то", "$\\exists N\\in\\mathbb{N}\\ \\forall n\\in\\mathbb{N}\\ (n>N):$", "$x_n < b$.", "Аналогично, если", "$\\lim x_n > b$,", "то", "$\\exists N\\in\\mathbb{N}\\ \\forall n\\in\\mathbb{N}\\ (n>N):$", "$x_n > b$.", "Смысл: $\\lim x_n < b \\Rightarrow x_n < b$ локально;", "$\\lim x_n > b \\Rightarrow x_n > b$ локально."
         ] },
         { id: "5.1", title: "Понятие бесконечно малой последовательности.", chunks: [
-            "Последовательность", "$(x_n)$", "называется бесконечно малой", "(б.м.),", "если", "$\\lim x_n = 0$,", "т.е.", "$\\forall \\varepsilon > 0 \\ \\exists N \\in \\mathbb{N} \\ \\forall n > N :$", "$|x_n| < \\varepsilon$.", "Смысл: члены последовательности стремятся к нулю."
+            "Последовательность", "$(x_n)$", "называется бесконечно малой", "(б.м.),", "если", "$\\lim x_n = 0$,", "т.е.", "$\\forall \\varepsilon > 0\\ \\exists N\\in\\mathbb{N}\\ \\forall n\\in\\mathbb{N}\\ (n>N):$", "$|x_n| < \\varepsilon$.", "Смысл: члены последовательности стремятся к нулю."
         ] },
         { id: "5.2", title: "Теорема о сумме бесконечно малых последовательностей.", chunks: [
             "Сумма двух б.м. последовательностей", "есть б.м. последовательность.", "Смысл: б.м. + б.м. = б.м."
@@ -240,13 +646,20 @@
     let originalChunks = [];
     let shuffledChunks = [];
     let currentAnswer = [];
+    let dragState = null;
+    let activeCleanup = null;
+    let lastDragEndTime = 0;
 
-    window.onload = initApp;
+    window.addEventListener('load', initApp);
+
+    window.addEventListener('blur', () => { if (dragState) cancelDrag(); });
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && dragState) cancelDrag();
+    });
 
     function initApp() {
         const list = document.getElementById('selection-list');
         list.innerHTML = "";
-        
         quizData.forEach((q, index) => {
             const div = document.createElement('div');
             div.className = 'selection-item';
@@ -254,7 +667,7 @@
                              <label for="chk-${index}"><b>${q.id}.</b> ${q.title}</label>`;
             list.appendChild(div);
         });
-        MathJax.typesetPromise();
+        typeset();
     }
 
     function toggleAll(state) {
@@ -263,19 +676,15 @@
 
     function startSelectedQuiz() {
         const checkedBoxes = document.querySelectorAll('#selection-list input[type="checkbox"]:checked');
-        
         if (checkedBoxes.length === 0) {
             alert("Выбери хотя бы один вопрос!");
             return;
         }
-
         activeQuizData = Array.from(checkedBoxes).map(cb => quizData[parseInt(cb.value)]);
         currentQuestionIndex = 0;
-
         document.getElementById('selection-screen').classList.add('hidden');
         document.getElementById('finish-screen').classList.add('hidden');
         document.getElementById('quiz-container').classList.remove('hidden');
-        
         loadQuestion();
     }
 
@@ -285,35 +694,29 @@
             document.getElementById('finish-screen').classList.remove('hidden');
             return;
         }
-
         const q = activeQuizData[currentQuestionIndex];
         document.getElementById('progress-text').innerText = `Вопрос ${currentQuestionIndex + 1} из ${activeQuizData.length}`;
         document.getElementById('q-title').innerText = q.id + ". " + q.title;
         document.getElementById('q-text').innerHTML = q.chunks.join(" ");
-        
         document.getElementById('learn-mode').classList.remove('hidden');
         document.getElementById('quiz-mode').classList.add('hidden');
         document.getElementById('next-btn').classList.add('hidden');
         document.getElementById('status').innerText = "";
-        
-        MathJax.typesetPromise();
+        typeset();
     }
 
     function startQuiz() {
         const q = activeQuizData[currentQuestionIndex];
         originalChunks = [...q.chunks];
-        
-        shuffledChunks = q.chunks.map((text, index) => ({ text, originalIndex: index, used: false }));
+        shuffledChunks = q.chunks.map(text => ({ text, used: false }));
         for (let i = shuffledChunks.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [shuffledChunks[i], shuffledChunks[j]] = [shuffledChunks[j], shuffledChunks[i]];
         }
-        
         currentAnswer = [];
-        
         document.getElementById('learn-mode').classList.add('hidden');
         document.getElementById('quiz-mode').classList.remove('hidden');
-        
+        document.getElementById('hint').classList.remove('hidden');
         renderPool();
         renderAnswerArea();
     }
@@ -322,7 +725,7 @@
         document.getElementById('quiz-mode').classList.add('hidden');
         document.getElementById('learn-mode').classList.remove('hidden');
         document.getElementById('status').innerText = "";
-        MathJax.typesetPromise();
+        typeset();
     }
 
     function backToMenu() {
@@ -331,46 +734,256 @@
         document.getElementById('selection-screen').classList.remove('hidden');
     }
 
+    function makeDraggable(btn, chunk, source, index) {
+        btn.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            if (dragState || activeCleanup) return;
+            startPointerDrag(e, btn, chunk, source, index);
+        });
+        btn.addEventListener('click', () => {
+            if (Date.now() - lastDragEndTime < 150) return;
+            if (source === 'pool') {
+                moveToAnswer(chunk, currentAnswer.length);
+            } else {
+                removeFromAnswer(chunk);
+            }
+        });
+    }
+
     function renderPool() {
         const pool = document.getElementById('pool-area');
         pool.innerHTML = "";
-        
-        shuffledChunks.forEach((chunk, i) => {
-            if (chunk.used) return; 
-            
+        shuffledChunks.forEach((chunk) => {
+            if (chunk.used) return;
             const btn = document.createElement('div');
             btn.className = 'word-btn';
             btn.innerHTML = chunk.text;
-            btn.onclick = () => moveToAnswer(chunk, i);
+            makeDraggable(btn, chunk, 'pool', -1);
             pool.appendChild(btn);
         });
-        MathJax.typesetPromise();
+        typeset();
     }
 
     function renderAnswerArea() {
         const area = document.getElementById('answer-area');
         area.innerHTML = "";
-        
+        if (currentAnswer.length === 0) {
+            const ph = document.createElement('div');
+            ph.className = 'answer-placeholder';
+            ph.textContent = 'Перетащите слова сюда или нажмите на них';
+            area.appendChild(ph);
+        }
         currentAnswer.forEach((chunk, i) => {
             const btn = document.createElement('div');
             btn.className = 'word-btn';
             btn.innerHTML = chunk.text;
-            btn.onclick = () => removeFromAnswer(chunk, i);
+            makeDraggable(btn, chunk, 'answer', i);
             area.appendChild(btn);
         });
-        MathJax.typesetPromise();
+        typeset();
     }
 
-    function moveToAnswer(chunk, poolIndex) {
+    function moveToAnswer(chunk, index) {
         chunk.used = true;
-        currentAnswer.push(chunk);
+        const at = (typeof index === 'number' && index >= 0 && index <= currentAnswer.length)
+            ? index : currentAnswer.length;
+        currentAnswer.splice(at, 0, chunk);
         renderPool();
         renderAnswerArea();
     }
 
-    function removeFromAnswer(chunk, answerIndex) {
+    function removeFromAnswer(chunk) {
+        const realIndex = currentAnswer.indexOf(chunk);
+        if (realIndex === -1) return;
         chunk.used = false;
-        currentAnswer.splice(answerIndex, 1);
+        currentAnswer.splice(realIndex, 1);
+        renderPool();
+        renderAnswerArea();
+    }
+
+    function startPointerDrag(e, el, chunk, source, index) {
+        const startX = e.clientX;
+        const startY = e.clientY;
+        let started = false;
+
+        const onMove = (ev) => {
+            if (!started) {
+                if (Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6) {
+                    started = true;
+                    beginDrag(ev, el, chunk, source, index);
+                }
+            }
+            if (started) {
+                ev.preventDefault();
+                updateDrag(ev);
+            }
+        };
+
+        const onUp = () => {
+            cleanup();
+            if (started) finishDrag();
+        };
+
+        const onCancel = () => {
+            cleanup();
+            if (started) cancelDrag();
+        };
+
+        function cleanup() {
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onUp);
+            document.removeEventListener('pointercancel', onCancel);
+            if (activeCleanup === cleanup) activeCleanup = null;
+        }
+
+        activeCleanup = cleanup;
+
+        document.addEventListener('pointermove', onMove, { passive: false });
+        document.addEventListener('pointerup', onUp);
+        document.addEventListener('pointercancel', onCancel);
+    }
+
+    function beginDrag(ev, el, chunk, source, index) {
+        try { el.setPointerCapture(ev.pointerId); } catch (err) {}
+
+        const rect = el.getBoundingClientRect();
+        const ghost = el.cloneNode(true);
+
+        ghost.style.position = 'fixed';
+        ghost.style.pointerEvents = 'none';
+        ghost.style.zIndex = '9999';
+        ghost.style.opacity = '0.92';
+        ghost.style.transform = 'scale(1.05) rotate(-2deg)';
+        ghost.style.boxShadow = '0 15px 40px rgba(0,0,0,0.35)';
+        ghost.style.borderColor = 'var(--accent)';
+        ghost.style.borderWidth = '2px';
+        ghost.style.left = rect.left + 'px';
+        ghost.style.top = rect.top + 'px';
+        ghost.style.width = rect.width + 'px';
+        ghost.style.margin = '0';
+        ghost.style.cursor = 'grabbing';
+        ghost.style.transition = 'none';
+        document.body.appendChild(ghost);
+
+        dragState = {
+            chunk, source, index, ghost,
+            originalEl: el,
+            pointerId: ev.pointerId,
+            offsetX: ev.clientX - rect.left,
+            offsetY: ev.clientY - rect.top,
+            dropIndex: null,
+            overAnswer: false,
+            overPool: false
+        };
+
+        el.style.opacity = '0.35';
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'grabbing';
+    }
+
+    function updateDrag(ev) {
+        if (!dragState) return;
+        const x = ev.clientX, y = ev.clientY;
+        dragState.ghost.style.left = (x - dragState.offsetX) + 'px';
+        dragState.ghost.style.top = (y - dragState.offsetY) + 'px';
+
+        const answerArea = document.getElementById('answer-area');
+        const poolArea = document.getElementById('pool-area');
+        const ar = answerArea.getBoundingClientRect();
+        const pr = poolArea.getBoundingClientRect();
+
+        const overAnswer = x >= ar.left && x <= ar.right && y >= ar.top && y <= ar.bottom;
+        const overPool = x >= pr.left && x <= pr.right && y >= pr.top && y <= pr.bottom;
+
+        answerArea.querySelectorAll('.drop-line').forEach(el => el.remove());
+        answerArea.classList.remove('drop-active');
+        poolArea.classList.remove('drop-active');
+
+        if (overAnswer) {
+            answerArea.classList.add('drop-active');
+            dragState.overAnswer = true;
+            dragState.overPool = false;
+
+            if (currentAnswer.length > 0) {
+                const children = [...answerArea.querySelectorAll('.word-btn')];
+                let idx = children.length;
+                for (let i = 0; i < children.length; i++) {
+                    const r = children[i].getBoundingClientRect();
+                    if (y < r.top) { idx = i; break; }
+                    if (y <= r.bottom && x < r.left + r.width / 2) { idx = i; break; }
+                }
+                dragState.dropIndex = idx;
+
+                const line = document.createElement('div');
+                line.className = 'drop-line';
+                if (idx >= children.length) {
+                    answerArea.appendChild(line);
+                } else {
+                    answerArea.insertBefore(line, children[idx]);
+                }
+            } else {
+                dragState.dropIndex = 0;
+            }
+        } else if (overPool) {
+            if (dragState.source === 'answer') {
+                poolArea.classList.add('drop-active');
+            }
+            dragState.dropIndex = null;
+            dragState.overAnswer = false;
+            dragState.overPool = true;
+        } else {
+            dragState.dropIndex = null;
+            dragState.overAnswer = false;
+            dragState.overPool = false;
+        }
+    }
+
+    function cleanupDragVisuals() {
+        if (!dragState) return;
+        try {
+            if (dragState.pointerId !== undefined &&
+                dragState.originalEl.hasPointerCapture &&
+                dragState.originalEl.hasPointerCapture(dragState.pointerId)) {
+                dragState.originalEl.releasePointerCapture(dragState.pointerId);
+            }
+        } catch (err) {}
+        dragState.ghost.remove();
+        dragState.originalEl.style.opacity = '';
+        document.querySelectorAll('.drop-line').forEach(el => el.remove());
+        document.getElementById('answer-area').classList.remove('drop-active');
+        document.getElementById('pool-area').classList.remove('drop-active');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+    }
+
+    function cancelDrag() {
+        if (activeCleanup) activeCleanup();
+        cleanupDragVisuals();
+        dragState = null;
+        lastDragEndTime = Date.now();
+    }
+
+    function finishDrag() {
+        if (!dragState) return;
+        const { source, index, chunk, dropIndex, overAnswer, overPool } = dragState;
+        cleanupDragVisuals();
+
+        if (source === 'pool' && overAnswer && dropIndex !== null) {
+            chunk.used = true;
+            currentAnswer.splice(dropIndex, 0, chunk);
+        } else if (source === 'answer' && overAnswer && dropIndex !== null) {
+            const [moved] = currentAnswer.splice(index, 1);
+            let target = dropIndex;
+            if (target > index) target--;
+            currentAnswer.splice(target, 0, moved);
+        } else if (source === 'answer' && overPool) {
+            const [moved] = currentAnswer.splice(index, 1);
+            moved.used = false;
+        }
+
+        dragState = null;
+        lastDragEndTime = Date.now();
+
         renderPool();
         renderAnswerArea();
     }
@@ -382,7 +995,6 @@
             status.className = "status-msg status-wrong";
             return;
         }
-
         let isCorrect = true;
         for (let i = 0; i < originalChunks.length; i++) {
             if (currentAnswer[i].text !== originalChunks[i]) {
@@ -390,17 +1002,14 @@
                 break;
             }
         }
-
         if (isCorrect) {
             status.innerText = "Абсолютно верно! 🎉";
             status.className = "status-msg status-correct";
-            
             document.querySelectorAll('#answer-area .word-btn').forEach(btn => {
                 btn.classList.add('correct');
-                btn.onclick = null; 
             });
-            
             document.getElementById('next-btn').classList.remove('hidden');
+            document.getElementById('hint').classList.add('hidden');
         } else {
             status.innerText = "Есть ошибки. Проверь порядок или нажми «Вернуться к тексту»!";
             status.className = "status-msg status-wrong";
@@ -416,6 +1025,7 @@
         currentAnswer = [];
         document.getElementById('status').innerText = "";
         document.getElementById('next-btn').classList.add('hidden');
+        document.getElementById('hint').classList.remove('hidden');
         renderPool();
         renderAnswerArea();
     }
