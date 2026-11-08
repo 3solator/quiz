@@ -445,7 +445,8 @@
         </div>
         <div class="selection-list" id="selection-list"></div>
         <div class="controls">
-            <button class="btn" onclick="startSelectedQuiz()" style="font-size: 1.1em; padding: 15px 40px;">Начать тест</button>
+            <button class="btn" onclick="startSelectedQuiz()" style="font-size: 1.1em; padding: 15px 30px;">Обычный тест</button>
+            <button class="btn btn-check" onclick="startTicketMode()" style="font-size: 1.1em; padding: 15px 30px;">🎲 Собрать билет (5 вопросов)</button>
         </div>
     </div>
 
@@ -470,7 +471,7 @@
             <div class="controls">
                 <button class="btn btn-check" onclick="checkAnswer()">Проверить</button>
                 <button class="btn btn-reset" onclick="resetQuiz()">Сбросить</button>
-                <button class="btn btn-back" onclick="goBackToLearn()">Вернуться к тексту</button>
+                <button class="btn btn-back" id="back-to-learn-btn" onclick="goBackToLearn()">Вернуться к тексту</button>
                 <button class="btn hidden" id="next-btn" onclick="nextQuestion()">Следующий вопрос →</button>
                 <button class="btn btn-back" onclick="backToMenu()">В меню</button>
             </div>
@@ -478,10 +479,10 @@
     </div>
 
     <div id="finish-screen" class="hidden" style="text-align: center; padding: 40px 20px;">
-        <h2 style="color: var(--success); margin-bottom: 12px;">🎉 Поздравляем! Ты прошел выбранные вопросы!</h2>
-        <p style="color: var(--text-soft);">Ты настоящий мастер матана. Удачи на коллоквиуме!</p>
+        <h2 id="finish-title" style="color: var(--success); margin-bottom: 12px;">🎉 Поздравляем! Ты прошел выбранные вопросы!</h2>
+        <p id="finish-text" style="color: var(--text-soft);">Ты настоящий мастер матана. Удачи на коллоквиуме!</p>
         <div class="controls">
-            <button class="btn" onclick="backToMenu()">Выбрать другие вопросы</button>
+            <button class="btn" id="finish-btn" onclick="backToMenu()">Выбрать другие вопросы</button>
         </div>
     </div>
 </div>
@@ -649,6 +650,7 @@
     let dragState = null;
     let activeCleanup = null;
     let lastDragEndTime = 0;
+    let isTicketMode = false;
 
     window.addEventListener('load', initApp);
 
@@ -680,7 +682,46 @@
             alert("Выбери хотя бы один вопрос!");
             return;
         }
+        isTicketMode = false;
         activeQuizData = Array.from(checkedBoxes).map(cb => quizData[parseInt(cb.value)]);
+        currentQuestionIndex = 0;
+        
+        document.getElementById('selection-screen').classList.add('hidden');
+        document.getElementById('finish-screen').classList.add('hidden');
+        document.getElementById('quiz-container').classList.remove('hidden');
+        loadQuestion();
+    }
+
+    function tokenizeText(text) {
+        // Извлекает $...$ как единое целое (включая прилегающие знаки, если есть),
+        // либо разделяет по пробелам
+        const parts = text.match(/(\$[^$]+\$|[^\s$]+)/g);
+        return parts ? parts : [];
+    }
+
+    function startTicketMode() {
+        const checkedBoxes = document.querySelectorAll('#selection-list input[type="checkbox"]:checked');
+        if (checkedBoxes.length < 5) {
+            alert("Для билета нужно выбрать хотя бы 5 вопросов!");
+            return;
+        }
+        isTicketMode = true;
+        
+        let selected = Array.from(checkedBoxes).map(cb => quizData[parseInt(cb.value)]);
+        selected = selected.sort(() => 0.5 - Math.random()).slice(0, 5);
+
+        activeQuizData = selected.map(q => {
+            const fragChunks = [];
+            q.chunks.forEach(c => {
+                fragChunks.push(...tokenizeText(c));
+            });
+            return {
+                id: q.id,
+                title: q.title,
+                chunks: fragChunks
+            };
+        });
+
         currentQuestionIndex = 0;
         document.getElementById('selection-screen').classList.add('hidden');
         document.getElementById('finish-screen').classList.add('hidden');
@@ -692,17 +733,40 @@
         if (currentQuestionIndex >= activeQuizData.length) {
             document.getElementById('quiz-container').classList.add('hidden');
             document.getElementById('finish-screen').classList.remove('hidden');
+            
+            if (isTicketMode) {
+                document.getElementById('finish-title').innerText = "🎉 Билет собран!";
+                document.getElementById('finish-text').innerText = "Ты успешно разобрал все 5 вопросов.";
+                document.getElementById('finish-btn').innerText = "Собрать ещё один билет";
+                document.getElementById('finish-btn').onclick = startTicketMode;
+            } else {
+                document.getElementById('finish-title').innerText = "🎉 Поздравляем! Ты прошел выбранные вопросы!";
+                document.getElementById('finish-text').innerText = "Ты настоящий мастер матана. Удачи на коллоквиуме!";
+                document.getElementById('finish-btn').innerText = "Выбрать другие вопросы";
+                document.getElementById('finish-btn').onclick = backToMenu;
+            }
             return;
         }
+
         const q = activeQuizData[currentQuestionIndex];
-        document.getElementById('progress-text').innerText = `Вопрос ${currentQuestionIndex + 1} из ${activeQuizData.length}`;
+        document.getElementById('progress-text').innerText = 
+            isTicketMode ? `Билет: Вопрос ${currentQuestionIndex + 1} из 5` : `Вопрос ${currentQuestionIndex + 1} из ${activeQuizData.length}`;
         document.getElementById('q-title').innerText = q.id + ". " + q.title;
-        document.getElementById('q-text').innerHTML = q.chunks.join(" ");
-        document.getElementById('learn-mode').classList.remove('hidden');
-        document.getElementById('quiz-mode').classList.add('hidden');
-        document.getElementById('next-btn').classList.add('hidden');
-        document.getElementById('status').innerText = "";
-        typeset();
+        
+        if (isTicketMode) {
+            document.getElementById('learn-mode').classList.add('hidden');
+            document.getElementById('quiz-mode').classList.remove('hidden');
+            document.getElementById('back-to-learn-btn').classList.add('hidden');
+            startQuiz();
+        } else {
+            document.getElementById('learn-mode').classList.remove('hidden');
+            document.getElementById('quiz-mode').classList.add('hidden');
+            document.getElementById('back-to-learn-btn').classList.remove('hidden');
+            document.getElementById('q-text').innerHTML = q.chunks.join(" ");
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('status').innerText = "";
+            typeset();
+        }
     }
 
     function startQuiz() {
@@ -714,14 +778,21 @@
             [shuffledChunks[i], shuffledChunks[j]] = [shuffledChunks[j], shuffledChunks[i]];
         }
         currentAnswer = [];
-        document.getElementById('learn-mode').classList.add('hidden');
-        document.getElementById('quiz-mode').classList.remove('hidden');
+        
+        if (!isTicketMode) {
+            document.getElementById('learn-mode').classList.add('hidden');
+            document.getElementById('quiz-mode').classList.remove('hidden');
+        }
+        
         document.getElementById('hint').classList.remove('hidden');
+        document.getElementById('status').innerText = "";
+        document.getElementById('next-btn').classList.add('hidden');
         renderPool();
         renderAnswerArea();
     }
 
     function goBackToLearn() {
+        if (isTicketMode) return;
         document.getElementById('quiz-mode').classList.add('hidden');
         document.getElementById('learn-mode').classList.remove('hidden');
         document.getElementById('status').innerText = "";
@@ -729,6 +800,7 @@
     }
 
     function backToMenu() {
+        isTicketMode = false;
         document.getElementById('quiz-container').classList.add('hidden');
         document.getElementById('finish-screen').classList.add('hidden');
         document.getElementById('selection-screen').classList.remove('hidden');
